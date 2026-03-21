@@ -54,6 +54,11 @@ app.post('/signingin', (req, res) => {
 })
 
 
+app.get("*catchall", (req, res) => {
+    res.status(404);
+    res.render("404")
+});
+
 app.listen(port, () => {
     console.log(`Server started on port ${port}`);
 });
