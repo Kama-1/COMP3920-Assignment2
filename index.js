@@ -12,11 +12,13 @@ app.get('/', (req, res) => {
 });
 
 app.get('/login', (req, res) => {
-    res.render("login")
+    const invalid = req.query.invalid;
+    res.render("login", {invalid: invalid});
 })
 
 app.get('/signup', (req, res) => {
-    res.render("signup")
+    const invalid = req.query.invalid;
+    res.render("signup", {invalid: invalid});
 })
 
 // TODO put async when db is added
@@ -26,6 +28,10 @@ app.post('/loggingin', (req, res) => {
 
     console.log(username);
     console.log(password);
+
+    if (!username || !password) {
+        res.redirect("/login?invalid=1")
+    }
 
     // TODO check that user is valid
     res.redirect('/loggedIn')
@@ -38,6 +44,10 @@ app.post('/signingin', (req, res) => {
 
     console.log(username);
     console.log(password);
+
+    if (!username || !password) {
+        res.redirect("/signup?invalid=1")
+    }
 
     // TODO add user
     res.redirect('/login')

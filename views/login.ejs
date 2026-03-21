@@ -8,6 +8,9 @@
     <button>Log in</button>
 </form>
 <br>
+<% if (invalid) { %>
+    <p style="color:red">Fields can not be blank</p>
+<% } %>
 <a href="/">Return</a>
 
 <%- include("templates/footer") %>
