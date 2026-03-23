@@ -1,9 +1,5 @@
 const mysql = require('mysql2/promise');
 
-console.log("Checking DB Config...");
-console.log("Host:", process.env.DB_HOST);
-console.log("User:", process.env.DB_USER)
-
 const database = mysql.createPool({
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
