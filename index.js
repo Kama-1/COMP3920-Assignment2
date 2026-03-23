@@ -1,3 +1,4 @@
+require('dotenv').config();
 //Define the include function for absolute file name
 global.base_dir = __dirname;
 global.abs_path = function(path) {
@@ -7,21 +8,18 @@ global.include = function(file) {
     return require(abs_path('/' + file));
 }
 
-require('dotenv').config();
-
 const express = require('express');
 const {printMySQLVersion} = require("./database/db_utils");
 const databaseAccess = require('./database/databaseAccessLayer');
-const {getUserById} = require("./database/databaseAccessLayer");
 const port = process.env.PORT || 3000;
 const app = express();
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
 
+const dbUtils = require('./database/db_utils');
 const database = include('database/databaseConnection');
-let success = include('database/db_utils');
 
-success = printMySQLVersion()
+success = dbUtils.printMySQLVersion()
 
 
 app.get('/', (req, res) => {

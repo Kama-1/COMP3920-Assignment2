@@ -1,13 +1,15 @@
 const database = include('database/databaseConnection');
 
+
 async function getAllUsers() {
+    
     let sqlQuery = `
 		SELECT user_id, username, password
 		FROM user;
 	`;
 
     try {
-        const results = await database.query(sqlQuery);
+        const results = await database.execute(sqlQuery);
         console.log(results[0]);
         return results[0];
     }
@@ -22,11 +24,11 @@ async function getUserById(userID) {
     let sqlQuery = `
 		SELECT user_id, username, password
 		FROM user
-		WHERE user_id = ${userID};
+		WHERE user_id = ?;
 	`;
 
     try {
-        const results = await database.query(sqlQuery);
+        const results = await database.execute(sqlQuery, [userID]);
         console.log(results[0]);
         return results[0];
     }
@@ -38,14 +40,15 @@ async function getUserById(userID) {
 }
 
 async function getUserByUsername(username) {
+    
     let sqlQuery = `
 		SELECT user_id, username, password
 		FROM user
-		WHERE username = '${username}';
+		WHERE username = ?;
 	`;
 
     try {
-        const results = await database.query(sqlQuery);
+        const results = await database.execute(sqlQuery, [username]);
         console.log(results[0]);
         return results[0];
     }
@@ -57,17 +60,14 @@ async function getUserByUsername(username) {
 }
 
 async function addUser(postData) {
+    
     let sqlInsert = `
 		INSERT INTO user (username, password) 
-		VALUES (:username, :password);
+		VALUES (?, ?);
 	`;
-    let params = {
-        username: postData.username,
-        password: postData.password
-    };
     console.log(sqlInsert);
     try {
-        const results = await database.query(sqlInsert, params);
+        const results = await database.execute(sqlInsert, [postData.username, postData.password]);
         console.log({results});
         console.log(`Inserted new row with id: ${results[0].insertId}`);
 
@@ -86,11 +86,11 @@ async function getAllGroupsForUserByID(userID) {
         FROM room
                  JOIN user_room ON user_room.room_id = room.room_id
                  JOIN user ON user.user_id = user_room.user_id
-        WHERE user.user_id = ${userID};
+        WHERE user.user_id = ?;
 	`;
 
     try {
-        const results = await database.query(sqlQuery);
+        const results = await database.execute(sqlQuery, [userID]);
         console.log(results[0]);
         return results[0];
     }
