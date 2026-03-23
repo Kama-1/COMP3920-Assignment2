@@ -20,7 +20,6 @@ const database = include('database/databaseConnection');
 let success = include('database/db_utils');
 
 success = printMySQLVersion()
-success.then(result => {})
 
 
 app.get('/', (req, res) => {
