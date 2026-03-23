@@ -11,6 +11,7 @@ require('dotenv').config();
 
 const express = require('express');
 const {printMySQLVersion} = require("./database/db_utils");
+const databaseAccess = require('./database/databaseAccessLayer');
 const port = process.env.PORT || 3000;
 const app = express();
 app.set('view engine', 'ejs');
@@ -52,8 +53,7 @@ app.post('/loggingin', (req, res) => {
     res.redirect('/loggedIn')
 })
 
-// TODO put async when db is added
-app.post('/signingin', (req, res) => {
+app.post('/signingin', async (req, res) => {
     var username = req.body.username;
     var password = req.body.password;
 
@@ -64,7 +64,11 @@ app.post('/signingin', (req, res) => {
         res.redirect("/signup?invalid=1")
     }
 
-    // TODO add user
+    var success = await databaseAccess.addUser({username: username, password: password});
+    if (success) {
+        console.log("Successfully created user")
+    }
+
     res.redirect('/login')
 })
 
