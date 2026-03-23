@@ -37,6 +37,25 @@ async function getUserById(userID) {
     }
 }
 
+async function getUserByUsername(username) {
+    let sqlQuery = `
+		SELECT user_id, username, password
+		FROM user
+		WHERE username = '${username}';
+	`;
+
+    try {
+        const results = await database.query(sqlQuery);
+        console.log(results[0]);
+        return results[0];
+    }
+    catch (err) {
+        console.log(`Error selecting specific user ${username}`);
+        console.log(err);
+        return null;
+    }
+}
+
 async function addUser(postData) {
     let sqlInsert = `
 		INSERT INTO user (username, password) 
@@ -82,4 +101,4 @@ async function getAllGroupsForUserByID(userID) {
     }
 }
 
-module.exports = {getAllUsers, addUser, getUserById, getAllGroupsForUserByID}
+module.exports = {getAllUsers, addUser, getUserById, getAllGroupsForUserByID, getUserByUsername}
