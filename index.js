@@ -10,14 +10,17 @@ global.include = function(file) {
 require('dotenv').config();
 
 const express = require('express');
+const {printMySQLVersion} = require("./database/db_utils");
 const port = process.env.PORT || 3000;
 const app = express();
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
 
-const database = include('databaseConnection');
-const db_utils = include('database/db_utils');
-const success = db_utils.printMySQLVersion();
+const database = include('database/databaseConnection');
+let success = include('database/db_utils');
+
+success = printMySQLVersion()
+success.then(result => {})
 
 
 app.get('/', (req, res) => {

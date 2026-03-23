@@ -1,4 +1,4 @@
-const database = include('databaseConnection');
+const database = include('database/databaseConnection');
 
 async function printMySQLVersion() {
     let sqlQuery = `
