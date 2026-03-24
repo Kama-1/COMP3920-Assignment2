@@ -17,12 +17,42 @@ app.use(express.urlencoded({ extended: true }));
 const dbUtils = require('./database/db_utils');
 const bcrypt = require('bcrypt');
 const saltRounds = 12;
+const session = require('express-session');
+const { MongoStore } = require('connect-mongo');
+const expireTime = 60*1000;
 
-success = dbUtils.printMySQLVersion()
+success = dbUtils.printMySQLVersion();
+
+
+const mongoStore = MongoStore.create({
+    mongoUrl: `mongodb+srv://${encodeURIComponent(process.env.MONGO_USER)}:${encodeURIComponent(process.env.MONGO_PASSWORD)}@assignment2.n6gwacu.mongodb.net/sessions?authSource=admin&appName=assignment2`,
+    collectionName: 'sessions',
+    ttl: expireTime,
+    autoRemove: 'native'
+});
+
+
+app.use(session({
+        secret: process.env.NODE_SESSION_SECRET,
+        store: mongoStore,
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+            maxAge: expireTime,
+            secure: false
+        }
+    }
+));
+
 
 
 app.get('/', (req, res) => {
     res.render("landing") // Send to views/landing
+});
+
+app.get('/test-session', (req, res) => {
+    req.session.testValue = "It works!";
+    res.send("Session variable set! Check Atlas now.");
 });
 
 app.get('/login', (req, res) => {
@@ -36,28 +66,51 @@ app.get('/signup', (req, res) => {
 })
 
 app.post('/loggingin', async (req, res) => {
-    var username = req.body.username;
-    var password = req.body.password;
-
-    console.log(username);
-    console.log(password);
+    const { username, password } = req.body;
 
     if (!username || !password) {
-        res.redirect("/login?invalid=1")
+        return res.redirect("/login?invalid=1");
     }
 
-    var userFound = await databaseAccess.getUserByUsername(username);
-    if (userFound.length === 0) {
-        let match = bcrypt.compare(password, userFound[0].password)
-        if (!match) {
-            console.log("Passwords dont match")
-            res.redirect("/login?invalid=1")
+    try {
+        const userFound = await databaseAccess.getUserByUsername(username);
+
+        if (userFound && userFound.length > 0) {
+            const match = await bcrypt.compare(password, userFound[0].password);
+
+            if (match) {
+                console.log("User authenticated successfully");
+                req.session.authenticated = true;
+                req.session.username = username;
+                console.log("Session saved");
+
+                req.session.save((err) => {
+                    if (err) {
+                        console.error("Session save error:", err);
+                        return res.redirect("/login?invalid=1");
+                    }
+                    return res.redirect('/loggedIn');
+                });
+            } else {
+                console.log("Passwords don't match");
+                return res.redirect("/login?invalid=1");
+            }
+        } else {
+            console.log("User not found in database");
+            return res.redirect("/login?invalid=1");
         }
-        res.redirect("/login?invalid=1")
+    } catch (err) {
+        console.error("Database or Auth Error:", err);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
+app.get('/loggedin', (req, res) => {
+    if (!req.session.authenticated) {
+        res.redirect('/login');
     }
     else {
-        console.log("User found")
-        res.redirect('/loggedIn')
+        res.render('home');
     }
 })
 
