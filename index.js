@@ -28,7 +28,10 @@ const mongoStore = MongoStore.create({
     mongoUrl: `mongodb+srv://${encodeURIComponent(process.env.MONGO_USER)}:${encodeURIComponent(process.env.MONGO_PASSWORD)}@assignment2.n6gwacu.mongodb.net/sessions?authSource=admin&appName=assignment2`,
     collectionName: 'sessions',
     ttl: expireTime,
-    autoRemove: 'native'
+    autoRemove: 'native',
+    crypto: {
+        secret: process.env.MONGO_SESSION_SECRET
+    }
 });
 
 
@@ -48,11 +51,6 @@ app.use(session({
 
 app.get('/', (req, res) => {
     res.render("landing") // Send to views/landing
-});
-
-app.get('/test-session', (req, res) => {
-    req.session.testValue = "It works!";
-    res.send("Session variable set! Check Atlas now.");
 });
 
 app.get('/login', (req, res) => {
@@ -117,10 +115,6 @@ app.get('/loggedin', (req, res) => {
 app.get('/home', async (req, res) => {
     const foundUser = await databaseAccess.getUserByUsername(req.session.username);
     const rooms = await databaseAccess.getAllRoomsForUserByID(foundUser[0].user_id);
-
-    console.log("Home data")
-    console.log(foundUser)
-    console.log(rooms)
 
     res.render("home", {username: req.session.username, numOfRooms: rooms.length, rooms: rooms});
 });
