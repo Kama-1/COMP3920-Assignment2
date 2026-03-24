@@ -110,9 +110,20 @@ app.get('/loggedin', (req, res) => {
         res.redirect('/login');
     }
     else {
-        res.render("home", {username: req.session.username});
+        res.redirect('/home');
     }
 })
+
+app.get('/home', async (req, res) => {
+    const foundUser = await databaseAccess.getUserByUsername(req.session.username);
+    const rooms = await databaseAccess.getAllRoomsForUserByID(foundUser[0].user_id);
+
+    console.log("Home data")
+    console.log(foundUser)
+    console.log(rooms)
+
+    res.render("home", {username: req.session.username, numOfRooms: rooms.length, rooms: rooms});
+});
 
 app.post('/signingin', async (req, res) => {
     var username = req.body.username;

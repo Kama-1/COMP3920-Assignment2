@@ -80,9 +80,9 @@ async function addUser(postData) {
     }
 }
 
-async function getAllGroupsForUserByID(userID) {
+async function getAllRoomsForUserByID(userID) {
     let sqlQuery = `
-		SELECT room_id, name
+		SELECT room.room_id, room.name
         FROM room
                  JOIN user_room ON user_room.room_id = room.room_id
                  JOIN user ON user.user_id = user_room.user_id
@@ -101,4 +101,4 @@ async function getAllGroupsForUserByID(userID) {
     }
 }
 
-module.exports = {getAllUsers, addUser, getUserById, getAllGroupsForUserByID, getUserByUsername}
+module.exports = {getAllUsers, addUser, getUserById, getAllRoomsForUserByID, getUserByUsername}

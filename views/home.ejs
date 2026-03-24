@@ -2,11 +2,24 @@
 <%- include("templates/userinfobar", {username: username}) %>
 
 <h1>Your Chats</h1>
-<h3>You are part of TODO chats</h3>
+<h3>You are part of <%= numOfRooms %> chats</h3>
 <a href="/create-room">Create Room</a>
 
 <div>
-    <h1>Welcome to the home page</h1>
+    <ul>
+        <% for (let room of rooms) { %>
+            <li>
+                <div>
+                    <div>
+                        <p><%= room.name %></p>
+                    </div>
+                    <div>
+                        <p>message</p>
+                    </div>
+                </div>
+            </li>
+        <% } %>
+    </ul>
 </div>
 
 <%- include("templates/footer") %>
