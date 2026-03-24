@@ -159,6 +159,11 @@ app.post('/creating-room', async (req, res) => {
     res.redirect('/loggedin/home');
 });
 
+app.get('/logout', (req, res) => {
+    req.session.destroy();
+    res.redirect('/');
+})
+
 app.post('/signingin', async (req, res) => {
     var username = req.body.username;
     var password = req.body.password;
