@@ -103,20 +103,33 @@ app.post('/loggingin', async (req, res) => {
     }
 });
 
-app.get('/loggedin', (req, res) => {
-    if (!req.session.authenticated) {
+function isValidSession(req) {
+    return req.session.authenticated;
+
+}
+
+function sessionValidation(req, res, next) {
+    if (!isValidSession(req)) {
+        req.session.destroy();
         res.redirect('/login');
     }
     else {
-        res.redirect('/home');
+        next();
     }
-})
+}
 
-app.get('/home', async (req, res) => {
-    if (!req.session.authenticated) {
-        return res.redirect('/login');
+app.use('/loggedin', sessionValidation);
+
+app.get('/loggedin', (req, res) => {
+    if (!isValidSession(req)) {
+        res.redirect('/login');
     }
+    else {
+        res.redirect('/loggedin/home');
+    }
+});
 
+app.get('/loggedin/home', async (req, res) => {
     const foundUser = await databaseAccess.getUserByUsername(req.session.username);
     const rooms = await databaseAccess.getAllRoomsForUserByID(foundUser[0].user_id);
 
