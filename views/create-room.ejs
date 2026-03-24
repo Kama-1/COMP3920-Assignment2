@@ -1,0 +1,19 @@
+<%- include("templates/header") %>
+<%- include("templates/userinfobar", {username: username}) %>
+
+<h1>Create Room</h1>
+<form action='/creating-room' method='post'>
+    <input title="Room Name" name='roomName' type='text' placeholder='Enter room name'>
+    <br>
+    <p>Users to add</p>
+    <% for (let user of users) { %>
+        <label>
+            <input type="checkbox" name="usersToAdd" title=<%= user.username%> value=<%= user.user_id%> <%= selectedUserID==user.user_id ? 'checked required' : '' %> >
+            <%= user.username%>
+        </label><br>
+    <% } %>
+    <br>
+    <button>Create room</button>
+</form>
+
+<%- include("templates/footer") %>

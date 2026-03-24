@@ -80,6 +80,41 @@ async function addUser(postData) {
     }
 }
 
+async function createNewRoom(roomName, userIDs) {
+    let sqlQuery = `
+        INSERT INTO room (name)
+        VALUES
+        (?)
+    `;
+    try {
+        const results = await database.execute(sqlQuery, [roomName]);
+        console.log(results[0]);
+        return results[0];
+    }
+    catch (err) {
+        console.log(`Error creating room ${roomName}`);
+        console.log(err);
+        return null;
+    }
+}
+
+async function addUsersToRoom(values) {
+    let sqlQuery = `
+        INSERT INTO user_room (room_id, user_id) VALUES ?
+        `
+
+    try {
+        const results = await database.query(sqlQuery, [values]);
+        console.log(results[0]);
+        return results[0];
+    }
+    catch (err) {
+        console.log(`Error entering users into user room ${values}`);
+        console.log(err);
+        return null;
+    }
+}
+
 async function getAllRoomsForUserByID(userID) {
     let sqlQuery = `
 		SELECT room.room_id, room.name
@@ -101,4 +136,4 @@ async function getAllRoomsForUserByID(userID) {
     }
 }
 
-module.exports = {getAllUsers, addUser, getUserById, getAllRoomsForUserByID, getUserByUsername}
+module.exports = {getAllUsers, addUser, getUserById, createNewRoom, addUsersToRoom, getAllRoomsForUserByID, getUserByUsername}

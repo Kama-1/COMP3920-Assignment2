@@ -136,6 +136,29 @@ app.get('/loggedin/home', async (req, res) => {
     res.render("home", {username: req.session.username, numOfRooms: rooms.length, rooms: rooms});
 });
 
+app.get('/loggedin/create-room', async (req, res) => {
+    let users = await databaseAccess.getAllUsers();
+    const selectedUsers = await databaseAccess.getUserByUsername(req.session.username);
+    const selectedUserID = selectedUsers[0].user_id;
+
+    res.render("create-room", {username: req.session.username, users: users, selectedUserID: selectedUserID});
+});
+
+app.post('/creating-room', async (req, res) => {
+    const selectedUsers = [].concat(req.body.usersToAdd || []);
+    const roomName = req.body.roomName
+
+    const result = await databaseAccess.createNewRoom(roomName);
+    const newRoomID = result.insertId;
+
+    if (selectedUsers.length > 0) {
+        const values = selectedUsers.map(id => [newRoomID, id]);
+        await databaseAccess.addUsersToRoom(values);
+    }
+
+    res.redirect('/loggedin/home');
+});
+
 app.post('/signingin', async (req, res) => {
     var username = req.body.username;
     var password = req.body.password;
