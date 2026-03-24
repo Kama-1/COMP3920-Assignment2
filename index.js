@@ -19,7 +19,7 @@ const bcrypt = require('bcrypt');
 const saltRounds = 12;
 const session = require('express-session');
 const { MongoStore } = require('connect-mongo');
-const expireTime = 60*1000;
+const expireTime = 15*60*1000;
 
 success = dbUtils.printMySQLVersion();
 
@@ -113,6 +113,10 @@ app.get('/loggedin', (req, res) => {
 })
 
 app.get('/home', async (req, res) => {
+    if (!req.session.authenticated) {
+        return res.redirect('/login');
+    }
+
     const foundUser = await databaseAccess.getUserByUsername(req.session.username);
     const rooms = await databaseAccess.getAllRoomsForUserByID(foundUser[0].user_id);
 
