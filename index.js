@@ -110,7 +110,7 @@ app.get('/loggedin', (req, res) => {
         res.redirect('/login');
     }
     else {
-        res.render('home');
+        res.render("home", {username: req.session.username});
     }
 })
 
