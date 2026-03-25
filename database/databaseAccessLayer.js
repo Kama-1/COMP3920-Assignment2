@@ -42,7 +42,12 @@ async function sendMessage(user_id, content) {
 
 async function getRoomMessages(roomID) {
     let sqlQuery = `
-        SELECT m.message_id, m.user_room_id, m.send_time, m.content, u.user_id, u.username
+        SELECT m.message_id,
+               m.user_room_id,
+               m.send_time,
+               m.content,
+               u.user_id,
+               u.username
         FROM message m
                  JOIN user_room ur ON ur.user_room_id = m.user_room_id
                  JOIN room r ON r.room_id = ur.room_id
@@ -58,6 +63,28 @@ async function getRoomMessages(roomID) {
     }
     catch (err) {
         console.log(`Error loading messages for room ${roomID}`);
+        console.log(err);
+        return null;
+    }
+}
+
+async function getRoomEmojis(roomID) {
+    let sqlQuery = `
+        SELECT e.emoji_id, e.name, e.image, eum.user_id, eum.message_id, ur.user_room_id
+        FROM emoji e
+                 JOIN emoji_user_message eum ON eum.emoji_id = e.emoji_id
+                 JOIN message m ON m.message_id = eum.message_id
+                 JOIN user_room ur ON ur.user_room_id = m.user_room_id
+        WHERE ur.room_id = ?;
+	`;
+
+    try {
+        const results = await database.execute(sqlQuery, [roomID]);
+        console.log(results[0]);
+        return results[0];
+    }
+    catch (err) {
+        console.log(`Error getting emojis for room ${roomID}`);
         console.log(err);
         return null;
     }
@@ -309,5 +336,6 @@ module.exports = {
     sendMessage,
     resetUnreadMessages,
     getUserRoomID,
-    updateUnreadMessages
+    updateUnreadMessages,
+    getRoomEmojis
 }

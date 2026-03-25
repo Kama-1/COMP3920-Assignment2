@@ -15,11 +15,12 @@
                 </p>
                 <div class="message-content">
                     <p><%= message.content %></p>
-                    <img class="emoji" src="/imgs/cool.png">
-                    <span>1</span>
-                    <img class="emoji" src="/imgs/laugh.png">
-                    <span>2</span>
-                    <span><a class="add-emoji" href="/loggedin/add-emoji?roomID=<%=room.room_id%>">(+)</a></span>
+                    <% for (let emoji of emojis) { %>
+                        <% if (emoji.message_id === message.message_id) { %>
+                            <img class="emoji" src="/imgs/<%= emoji.image %>" alt="<%= emoji.name %>">
+                        <% } %>
+                    <% } %>
+                    <a class="add-emoji" href="/loggedin/add-emoji?roomID=<%=room.room_id%>">(+)</a>
                 </div>
             </div>
         </p>

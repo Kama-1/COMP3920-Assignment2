@@ -166,8 +166,8 @@ app.get('/loggedin/room', async (req, res) => {
     const roomUsers = await databaseAccess.getRoomUsersByRoomID(roomID);
     const currentUser = await databaseAccess.getUserByUsername(req.session.username);
     const roomMessages = await databaseAccess.getRoomMessages(roomID);
+    const roomEmojis = [].concat(await databaseAccess.getRoomEmojis(roomID));
     let userFound = null;
-
 
     roomUsers.forEach((user) => {
         if (user.user_id === currentUser[0].user_id) {
@@ -178,7 +178,7 @@ app.get('/loggedin/room', async (req, res) => {
         await databaseAccess.resetUnreadMessages(userFound);
         console.log("Most recent message updated")
 
-        res.render("room", {room: room[0], username: req.session.username, messages: roomMessages});
+        res.render("room", {room: room[0], username: req.session.username, messages: roomMessages, emojis: roomEmojis});
     }
     else {
         res.redirect('/loggedin/unauthorized-room');
