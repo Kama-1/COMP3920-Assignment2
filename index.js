@@ -184,6 +184,21 @@ app.get('/loggedin/unauthorized-room', (req, res) => {
    res.render("unauthorized-room", {username: req.session.username});
 });
 
+app.post('/loggedin/send-message', async (req, res) => {
+    const message = req.body.message;
+    const currentUser = await databaseAccess.getUserByUsername(req.session.username);
+    const roomID = req.query.id;
+    const userRoomData = await databaseAccess.getRoomDataForUser(roomID, currentUser[0].user_id);
+
+    console.log("Send message info")
+    console.log(message);
+    console.log(roomID);
+
+    await databaseAccess.sendMessage(userRoomData[0].user_room_id, message);
+
+    res.redirect("/loggedin/room?id=" + roomID);
+});
+
 app.get('/logout', (req, res) => {
     req.session.destroy();
     res.redirect('/');

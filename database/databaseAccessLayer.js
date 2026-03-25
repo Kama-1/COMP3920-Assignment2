@@ -20,8 +20,24 @@ async function getAllUsers() {
     }
 }
 
-async function sendMessage(content) {
+async function sendMessage(user_id, content) {
+    let sqlQuery = `
+        INSERT INTO message
+            (user_room_id, send_time, content)
+        VALUES
+            (?, NOW(), ?);
+	`;
 
+    try {
+        const results = await database.execute(sqlQuery, [user_id, content]);
+        console.log(results[0]);
+        return results[0];
+    }
+    catch (err) {
+        console.log(`Error sending message ${content}`);
+        console.log(err);
+        return null;
+    }
 }
 
 async function getRoomMessages(roomID) {
@@ -31,7 +47,8 @@ async function getRoomMessages(roomID) {
                  JOIN user_room ur ON ur.user_room_id = m.user_room_id
                  JOIN room r ON r.room_id = ur.room_id
                  JOIN user u ON ur.user_id = u.user_id
-        WHERE r.room_id = ?;
+        WHERE r.room_id = ?
+        ORDER BY m.send_time ASC;
 	`;
 
     try {
@@ -181,8 +198,8 @@ async function getRoomUsersByRoomID(roomID) {
 
 async function getRoomDataForUser(roomID, userID) {
     let sqlQuery = `
-		SELECT last_message_read_id, unread_message_count
-        FROM room_user
+		SELECT user_room_id, last_read_message_id, unread_message_count
+        FROM user_room
         WHERE room_id = ?
 		AND user_id = ?
 	`;

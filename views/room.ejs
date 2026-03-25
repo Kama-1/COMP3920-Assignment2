@@ -3,6 +3,7 @@
 
 <h1><%= room.name %></h1>
 <a href="/loggedin/invite-users?id=<%= room.room_id %>">Invite Users</a>
+<a href="/loggedin/home">Return Home</a>
 <br>
 <div>
     <% for (let message of messages) { %>
@@ -19,7 +20,7 @@
         </p>
     <% } %>
 </div>
-<form>
+<form action="/loggedin/send-message?id=<%= room.room_id %>" method="post">
     <input type="text" name="message" placeholder="Enter a message">
     <input type="submit" value="Send Message">
 </form>
