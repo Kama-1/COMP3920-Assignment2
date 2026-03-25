@@ -1,0 +1,21 @@
+
+.message-content {
+    .emoji {
+        width: 1em;
+        height: 1em;
+    }
+
+    .emoji:hover {
+        background-color: cornflowerblue;
+    }
+
+    .add-emoji {
+        display: none;
+    }
+}
+
+.message-content:hover {
+    .add-emoji {
+        display: inline;
+    }
+}
