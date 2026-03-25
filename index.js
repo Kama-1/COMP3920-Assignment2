@@ -165,14 +165,16 @@ app.get('/loggedin/room', async (req, res) => {
     const roomUsers = await databaseAccess.getRoomUsersByRoomID(roomID);
     const currentUser = await databaseAccess.getUserByUsername(req.session.username);
     const roomMessages = await databaseAccess.getRoomMessages(roomID);
-    let userFound = false;
+    const mostRecentMessage = roomMessages[roomMessages.length - 1];
+    let userFound = null;
 
     roomUsers.forEach((user) => {
         if (user.user_id === currentUser[0].user_id) {
-            userFound = true;
+            userFound = user.user_room_id;
         }
     });
     if (userFound) {
+        await databaseAccess.updateMostRecentMessage(mostRecentMessage.message_id, userFound);
         res.render("room", {room: room[0], username: req.session.username, messages: roomMessages});
     }
     else {
@@ -236,7 +238,6 @@ app.post('/signingin', async (req, res) => {
 
     res.redirect('/login')
 })
-
 
 app.get("*catchall", (req, res) => {
     res.status(404);

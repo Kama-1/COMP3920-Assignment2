@@ -160,7 +160,7 @@ async function getRoomByID(roomID) {
 
 async function getRoomUsersByRoomID(roomID) {
     let sqlQuery = `
-		SELECT user_id
+		SELECT user_id, user_room_id
         FROM user_room
         WHERE room_id = ?;
 	`;
@@ -238,6 +238,25 @@ async function getAllRoomsForUserByID(userID) {
     }
 }
 
+async function updateMostRecentMessage(messageID, userRoomID) {
+    let sqlQuery = `
+        UPDATE user_room
+        SET last_read_message_id = ?
+        WHERE user_room_id = ?;
+	`;
+
+    try {
+        const results = await database.execute(sqlQuery, [messageID, userRoomID]);
+        console.log(results[0]);
+        return results[0];
+    }
+    catch (err) {
+        console.log(`Error updating most recent message ${messageID} for user ${userID}`);
+        console.log(err);
+        return null;
+    }
+}
+
 module.exports = {
     getAllUsers,
     addUser,
@@ -250,5 +269,6 @@ module.exports = {
     getAllRoomsForUserByID,
     getUserByUsername,
     getRoomMessages,
-    sendMessage
+    sendMessage,
+    updateMostRecentMessage
 }
