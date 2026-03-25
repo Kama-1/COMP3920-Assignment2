@@ -197,35 +197,35 @@ async function getUsersNotInRoom(roomID) {
     }
 }
 
-async function getRoomDataForUser(roomID, userID) {
+
+
+async function getAllRoomDataForUserByID(userID) {
     let sqlQuery = `
-		SELECT user_room_id, last_read_message_id, unread_message_count
-        FROM user_room
-        WHERE room_id = ?
-		AND user_id = ?
-	`;
-
-    try {
-        const results = await database.execute(sqlQuery, [roomID, userID]);
-        console.log(results[0]);
-        return results[0];
-    }
-    catch (err) {
-        console.log(`Error finding user ${userID} in room ${roomID}`);
-        console.log(err);
-        return null;
-    }
-}
-
-async function getAllRoomsForUserByID(userID) {
-    let sqlQuery = `
-		SELECT room.room_id, room.name
-        FROM room
-                 JOIN user_room ON user_room.room_id = room.room_id
-                 JOIN user ON user.user_id = user_room.user_id
-        WHERE user.user_id = ?;
-	`;
-
+        SELECT
+            r.room_id,
+            r.name,
+            ur.user_room_id,
+            lm.content AS last_message_content,
+            lm.send_time AS last_message_send_time,
+            lm.username as last_message_sender,
+            ur.unread_message_count
+        FROM room r
+                 JOIN user_room ur ON ur.room_id = r.room_id
+                 JOIN user u ON u.user_id = ur.user_id
+                 LEFT JOIN (
+            SELECT m1.content, m1.send_time, mur.room_id, ulm.username
+            FROM message m1
+                     JOIN user_room mur ON mur.user_room_id = m1.user_room_id
+                     JOIN user ulm ON ulm.user_id = mur.user_id
+            WHERE m1.send_time = (
+                SELECT MAX(m2.send_time)
+                FROM message m2
+                         JOIN user_room mur2 ON mur2.user_room_id = m2.user_room_id
+                WHERE mur2.room_id = mur.room_id
+            )
+        ) AS lm ON lm.room_id = r.room_id
+        WHERE u.user_id = ?;
+    `;
     try {
         const results = await database.execute(sqlQuery, [userID]);
         console.log(results[0]);
@@ -262,11 +262,10 @@ module.exports = {
     addUser,
     getUsersNotInRoom,
     getRoomByID,
-    getRoomDataForUser,
     getRoomUsersByRoomID,
     createNewRoom,
     addUsersToRoom,
-    getAllRoomsForUserByID,
+    getAllRoomDataForUserByID,
     getUserByUsername,
     getRoomMessages,
     sendMessage,

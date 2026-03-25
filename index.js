@@ -131,9 +131,9 @@ app.get('/loggedin', (req, res) => {
 
 app.get('/loggedin/home', async (req, res) => {
     const foundUser = await databaseAccess.getUserByUsername(req.session.username);
-    const rooms = await databaseAccess.getAllRoomsForUserByID(foundUser[0].user_id);
+    const roomData = await databaseAccess.getAllRoomDataForUserByID(foundUser[0].user_id);
 
-    res.render("home", {username: req.session.username, numOfRooms: rooms.length, rooms: rooms});
+    res.render("home", {username: req.session.username, numOfRooms: roomData.length, roomData: roomData});
 });
 
 app.get('/loggedin/create-room', async (req, res) => {
