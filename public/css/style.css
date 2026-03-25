@@ -7,10 +7,6 @@
         height: 1em;
     }
 
-    .emoji:hover {
-        background-color: cornflowerblue;
-    }
-
     .add-emoji {
         display: none;
     }
@@ -19,5 +15,8 @@
 .message-content:hover {
     .add-emoji {
         display: inline;
+    }
+    .add-emoji:hover {
+        background-color: cornflowerblue;
     }
 }

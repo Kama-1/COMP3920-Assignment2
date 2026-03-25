@@ -14,14 +14,20 @@
                     <%= message.send_time %>
                 </p>
                 <div class="message-content">
-                    <p><%= message.content %></p>
+                    <p>
+                        <%= message.content %>
+                        <span>
+                            <% for (let emoji of allEmojis) { %>
+                                <a class="add-emoji" href="/loggedin/add-emoji?roomID=<%=room.room_id%>&messageID=<%=message.message_id%>&emojiID=<%=emoji.emoji_id%>">(<span><img class="emoji" src="/imgs/<%=emoji.image%>" alt="<%=emoji.name%>"></span>)</a>
+                            <% } %>
+                        </span>
+                    </p>
                     <% for (let emoji of emojis) { %>
                         <% if (emoji.message_id === message.message_id) { %>
                             <img class="emoji" src="/imgs/<%= emoji.image %>" alt="<%= emoji.name %>">
                         <% } %>
                     <% } %>
-                    <a class="add-emoji" href="/loggedin/add-emoji?roomID=<%=room.room_id%>">(+)</a>
-                </div>
+                    </div>
             </div>
         </p>
     <% } %>

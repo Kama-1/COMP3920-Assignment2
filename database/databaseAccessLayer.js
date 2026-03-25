@@ -90,6 +90,26 @@ async function getRoomEmojis(roomID) {
     }
 }
 
+async function addEmoji(emojiID, userID, messageID) {
+    let sqlQuery = `
+        INSERT INTO emoji_user_message
+            (emoji_id, user_id, message_id)
+        VALUES
+            (?, ?, ?);
+	`;
+
+    try {
+        const results = await database.execute(sqlQuery, [emojiID, userID, messageID]);
+        console.log(results[0]);
+        return results[0];
+    }
+    catch (err) {
+        console.log(`Error adding emoji ${emojiID} to message ${messageID}`);
+        console.log(err);
+        return null;
+    }
+}
+
 async function getUserByUsername(username) {
     
     let sqlQuery = `
@@ -224,6 +244,24 @@ async function getUsersNotInRoom(roomID) {
     }
 }
 
+async function getEmojiList() {
+    let sqlQuery = `
+        SELECT emoji_id, name, image
+        FROM emoji;
+	`;
+
+    try {
+        const results = await database.execute(sqlQuery);
+        console.log(results[0]);
+        return results[0];
+    }
+    catch (err) {
+        console.log(`Error getting emoji list`);
+        console.log(err);
+        return null;
+    }
+}
+
 async function resetUnreadMessages(userRoomID) {
     let sqlQuery = `
         UPDATE user_room
@@ -337,5 +375,7 @@ module.exports = {
     resetUnreadMessages,
     getUserRoomID,
     updateUnreadMessages,
-    getRoomEmojis
+    getRoomEmojis,
+    addEmoji,
+    getEmojiList
 }

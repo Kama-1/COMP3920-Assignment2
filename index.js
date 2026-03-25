@@ -167,6 +167,7 @@ app.get('/loggedin/room', async (req, res) => {
     const currentUser = await databaseAccess.getUserByUsername(req.session.username);
     const roomMessages = await databaseAccess.getRoomMessages(roomID);
     const roomEmojis = [].concat(await databaseAccess.getRoomEmojis(roomID));
+    const emojiList = await databaseAccess.getEmojiList();
     let userFound = null;
 
     roomUsers.forEach((user) => {
@@ -178,11 +179,29 @@ app.get('/loggedin/room', async (req, res) => {
         await databaseAccess.resetUnreadMessages(userFound);
         console.log("Most recent message updated")
 
-        res.render("room", {room: room[0], username: req.session.username, messages: roomMessages, emojis: roomEmojis});
+        res.render("room", {room: room[0], username: req.session.username, messages: roomMessages, emojis: roomEmojis, allEmojis: emojiList});
     }
     else {
         res.redirect('/loggedin/unauthorized-room');
     }
+});
+
+app.get('/loggedin/add-emoji', async (req, res) => {
+    const roomID = req.query.roomID;
+    const messageID = req.query.messageID;
+    const emojiID = req.query.emojiID;
+    const currentUser = await databaseAccess.getUserByUsername(req.session.username);
+
+    console.log("EMOJI DATA")
+    console.log(roomID)
+    console.log(messageID)
+    console.log(emojiID)
+    console.log(currentUser[0].password)
+
+    await databaseAccess.addEmoji(emojiID, currentUser[0].user_id, messageID);
+
+
+    res.redirect("/loggedin/room?id=" + roomID);
 });
 
 app.get('/loggedin/invite-users', async (req, res) => {
