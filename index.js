@@ -179,7 +179,7 @@ app.get('/loggedin/room', async (req, res) => {
     });
     if (userFound) {
         if (mostRecentMessage) {
-            await databaseAccess.updateMostRecentMessage(mostRecentMessage.message_id, userFound);
+            await databaseAccess.resetUnreadMessages(userFound);
             console.log("Most recent message updated")
         }
         res.render("room", {room: room[0], username: req.session.username, messages: roomMessages});
@@ -219,6 +219,7 @@ app.post('/loggedin/send-message', async (req, res) => {
     const userRoom = await databaseAccess.getUserRoomID(roomID, currentUser[0].user_id);
 
     await databaseAccess.sendMessage(userRoom[0].user_room_id, message);
+    await databaseAccess.updateUnreadMessages(roomID, currentUser[0].user_id)
 
     res.redirect("/loggedin/room?id=" + roomID);
 });

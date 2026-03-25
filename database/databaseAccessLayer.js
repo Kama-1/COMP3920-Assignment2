@@ -197,7 +197,24 @@ async function getUsersNotInRoom(roomID) {
     }
 }
 
+async function resetUnreadMessages(userRoomID) {
+    let sqlQuery = `
+        UPDATE user_room
+        SET unread_message_count = 0
+        WHERE user_room_id = ?
+	`;
 
+    try {
+        const results = await database.execute(sqlQuery, [userRoomID]);
+        console.log(results[0]);
+        return results[0];
+    }
+    catch (err) {
+        console.log(`Error resetting unread messages`);
+        console.log(err);
+        return null;
+    }
+}
 
 async function getAllRoomDataForUserByID(userID) {
     let sqlQuery = `
@@ -258,15 +275,16 @@ async function getUserRoomID(roomID, userID) {
     }
 }
 
-async function updateMostRecentMessage(messageID, userRoomID) {
+async function updateUnreadMessages(roomID, userID) {
     let sqlQuery = `
         UPDATE user_room
-        SET last_read_message_id = ?
-        WHERE user_room_id = ?;
+        SET unread_message_count = COALESCE(unread_message_count, 0) + 1
+        WHERE room_id = ?
+          AND user_id != ?;
 	`;
 
     try {
-        const results = await database.execute(sqlQuery, [messageID, userRoomID]);
+        const results = await database.execute(sqlQuery, [roomID, userID]);
         console.log(results[0]);
         return results[0];
     }
@@ -289,6 +307,7 @@ module.exports = {
     getUserByUsername,
     getRoomMessages,
     sendMessage,
-    updateMostRecentMessage,
-    getUserRoomID
+    resetUnreadMessages,
+    getUserRoomID,
+    updateUnreadMessages
 }

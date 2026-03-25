@@ -12,6 +12,7 @@
                 <div>
                     <div>
                         <a href="/loggedin/room?id=<%= room.room_id %>"><%= room.name %></a>
+                        <p><%= room.unread_message_count %> unread messages</p>
                     </div>
                     <div>
                         <p><%= room.last_message_content %> - <b><%= room.last_message_sender %></b></p>
