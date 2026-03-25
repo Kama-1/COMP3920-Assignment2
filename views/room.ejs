@@ -1,0 +1,27 @@
+<%- include("templates/header") %>
+<%- include("templates/userinfobar", {username: username}) %>
+
+<h1><%= room.name %></h1>
+<a href="/loggedin/invite-users?id=<%= room.room_id %>">Invite Users</a>
+<br>
+<div>
+    <% for (let message of messages) { %>
+        <p>
+            <div>
+                <p>
+                    <b><%= message.username %></b>
+                    <%= message.send_time %>
+                </p>
+                <p>
+                    <%= message.content %>
+                </p>
+            </div>
+        </p>
+    <% } %>
+</div>
+<form>
+    <input type="text" name="message" placeholder="Enter a message">
+    <input type="submit" value="Send Message">
+</form>
+
+<%- include("templates/footer") %>

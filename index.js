@@ -159,6 +159,31 @@ app.post('/creating-room', async (req, res) => {
     res.redirect('/loggedin/home');
 });
 
+app.get('/loggedin/room', async (req, res) => {
+    const roomID = req.query.id;
+    const room = await databaseAccess.getRoomByID(roomID);
+    const roomUsers = await databaseAccess.getRoomUsersByRoomID(roomID);
+    const currentUser = await databaseAccess.getUserByUsername(req.session.username);
+    const roomMessages = await databaseAccess.getRoomMessages(roomID);
+    let userFound = false;
+
+    roomUsers.forEach((user) => {
+        if (user.user_id === currentUser[0].user_id) {
+            userFound = true;
+        }
+    });
+    if (userFound) {
+        res.render("room", {room: room[0], username: req.session.username, messages: roomMessages});
+    }
+    else {
+        res.redirect('/loggedin/unauthorized-room');
+    }
+});
+
+app.get('/loggedin/unauthorized-room', (req, res) => {
+   res.render("unauthorized-room", {username: req.session.username});
+});
+
 app.get('/logout', (req, res) => {
     req.session.destroy();
     res.redirect('/');
