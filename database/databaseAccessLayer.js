@@ -238,6 +238,26 @@ async function getAllRoomDataForUserByID(userID) {
     }
 }
 
+async function getUserRoomID(roomID, userID) {
+    let sqlQuery = `
+        SELECT user_room_id
+        FROM user_room
+        WHERE room_id = ?
+        AND user_id = ?;
+	`;
+
+    try {
+        const results = await database.execute(sqlQuery, [roomID, userID]);
+        console.log(results[0]);
+        return results[0];
+    }
+    catch (err) {
+        console.log(`Error updating most recent message ${messageID} for user ${userID}`);
+        console.log(err);
+        return null;
+    }
+}
+
 async function updateMostRecentMessage(messageID, userRoomID) {
     let sqlQuery = `
         UPDATE user_room
@@ -269,5 +289,6 @@ module.exports = {
     getUserByUsername,
     getRoomMessages,
     sendMessage,
-    updateMostRecentMessage
+    updateMostRecentMessage,
+    getUserRoomID
 }

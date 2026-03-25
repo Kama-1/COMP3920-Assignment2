@@ -216,9 +216,9 @@ app.post('/loggedin/send-message', async (req, res) => {
     const message = req.body.message;
     const currentUser = await databaseAccess.getUserByUsername(req.session.username);
     const roomID = req.query.id;
-    const userRoomData = await databaseAccess.getRoomDataForUser(roomID, currentUser[0].user_id);
+    const userRoom = await databaseAccess.getUserRoomID(roomID, currentUser[0].user_id);
 
-    await databaseAccess.sendMessage(userRoomData[0].user_room_id, message);
+    await databaseAccess.sendMessage(userRoom[0].user_room_id, message);
 
     res.redirect("/loggedin/room?id=" + roomID);
 });
