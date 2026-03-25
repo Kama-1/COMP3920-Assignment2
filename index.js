@@ -168,13 +168,20 @@ app.get('/loggedin/room', async (req, res) => {
     const mostRecentMessage = roomMessages[roomMessages.length - 1];
     let userFound = null;
 
+    console.log(roomID)
+    console.log(roomMessages)
+    console.log(mostRecentMessage);
+
     roomUsers.forEach((user) => {
         if (user.user_id === currentUser[0].user_id) {
             userFound = user.user_room_id;
         }
     });
     if (userFound) {
-        await databaseAccess.updateMostRecentMessage(mostRecentMessage.message_id, userFound);
+        if (mostRecentMessage) {
+            await databaseAccess.updateMostRecentMessage(mostRecentMessage.message_id, userFound);
+            console.log("Most recent message updated")
+        }
         res.render("room", {room: room[0], username: req.session.username, messages: roomMessages});
     }
     else {
