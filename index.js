@@ -144,7 +144,7 @@ app.get('/loggedin/create-room', async (req, res) => {
     res.render("create-room", {username: req.session.username, users: users, selectedUserID: selectedUserID});
 });
 
-app.post('/creating-room', async (req, res) => {
+app.post('/loggedin/creating-room', async (req, res) => {
     const selectedUsers = [].concat(req.body.usersToAdd || []);
     const roomName = req.body.roomName
 
@@ -180,6 +180,25 @@ app.get('/loggedin/room', async (req, res) => {
     }
 });
 
+app.get('/loggedin/invite-users', async (req, res) => {
+   const roomID = req.query.id;
+   const usersNotInRoom = await databaseAccess.getUsersNotInRoom(roomID);
+
+   res.render("invite-users", {roomID: roomID, username: req.session.username, users: usersNotInRoom});
+});
+
+app.post('/loggedin/inviting', async (req, res) => {
+   const roomID = req.query.id;
+   const selectedUsers = [].concat(req.body.usersToAdd || []);
+
+    if (selectedUsers.length > 0) {
+        const values = selectedUsers.map(id => [roomID, id]);
+        await databaseAccess.addUsersToRoom(values);
+    }
+
+    res.redirect("/loggedin/room?id=" + roomID);
+});
+
 app.get('/loggedin/unauthorized-room', (req, res) => {
    res.render("unauthorized-room", {username: req.session.username});
 });
@@ -189,10 +208,6 @@ app.post('/loggedin/send-message', async (req, res) => {
     const currentUser = await databaseAccess.getUserByUsername(req.session.username);
     const roomID = req.query.id;
     const userRoomData = await databaseAccess.getRoomDataForUser(roomID, currentUser[0].user_id);
-
-    console.log("Send message info")
-    console.log(message);
-    console.log(roomID);
 
     await databaseAccess.sendMessage(userRoomData[0].user_room_id, message);
 
@@ -213,9 +228,6 @@ app.post('/signingin', async (req, res) => {
     }
 
     const hashed_password = bcrypt.hashSync(password, saltRounds);
-
-    console.log(username);
-    console.log(password);
 
     var success = await databaseAccess.addUser({username: username, password: hashed_password});
     if (success) {

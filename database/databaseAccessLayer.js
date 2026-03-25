@@ -63,25 +63,6 @@ async function getRoomMessages(roomID) {
     }
 }
 
-async function getUserById(userID) {
-    let sqlQuery = `
-		SELECT user_id, username, password
-		FROM user
-		WHERE user_id = ?;
-	`;
-
-    try {
-        const results = await database.execute(sqlQuery, [userID]);
-        console.log(results[0]);
-        return results[0];
-    }
-    catch (err) {
-        console.log(`Error selecting specific user ${userID}`);
-        console.log(err);
-        return null;
-    }
-}
-
 async function getUserByUsername(username) {
     
     let sqlQuery = `
@@ -196,6 +177,26 @@ async function getRoomUsersByRoomID(roomID) {
     }
 }
 
+async function getUsersNotInRoom(roomID) {
+    let sqlQuery = `
+        SELECT user.user_id, user.username
+        FROM user
+        WHERE user_id NOT IN (SELECT user_id
+                              FROM user_room
+                              WHERE room_id = ?);
+    `;
+    try {
+        const results = await database.execute(sqlQuery, [roomID]);
+        console.log(results[0]);
+        return results[0];
+    }
+    catch (err) {
+        console.log(`Error finding users not in room ${roomID}`);
+        console.log(err);
+        return null;
+    }
+}
+
 async function getRoomDataForUser(roomID, userID) {
     let sqlQuery = `
 		SELECT user_room_id, last_read_message_id, unread_message_count
@@ -240,7 +241,7 @@ async function getAllRoomsForUserByID(userID) {
 module.exports = {
     getAllUsers,
     addUser,
-    getUserById,
+    getUsersNotInRoom,
     getRoomByID,
     getRoomDataForUser,
     getRoomUsersByRoomID,

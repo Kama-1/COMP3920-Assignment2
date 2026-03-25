@@ -1,0 +1,19 @@
+<%- include("templates/header") %>
+<%- include("templates/userinfobar", {username: username}) %>
+
+<h1>Invite Users</h1>
+<form action='/loggedin/inviting?id=<%= roomID %>' method='post'>
+    <p>Users to add</p>
+    <% for (let user of users) { %>
+        <label>
+            <input type="checkbox" name="usersToAdd" title=<%= user.username%> value=<%= user.user_id%> >
+            <%= user.username%>
+        </label><br>
+    <% } %>
+    <br>
+    <button>Add users</button>
+</form>
+
+<a href='/loggedin/home'>Cancel</a>
+
+<%- include("templates/footer") %>
