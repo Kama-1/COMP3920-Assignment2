@@ -166,12 +166,8 @@ app.get('/loggedin/room', async (req, res) => {
     const roomUsers = await databaseAccess.getRoomUsersByRoomID(roomID);
     const currentUser = await databaseAccess.getUserByUsername(req.session.username);
     const roomMessages = await databaseAccess.getRoomMessages(roomID);
-    const mostRecentMessage = roomMessages[roomMessages.length - 1];
     let userFound = null;
 
-    console.log(roomID)
-    console.log(roomMessages)
-    console.log(mostRecentMessage);
 
     roomUsers.forEach((user) => {
         if (user.user_id === currentUser[0].user_id) {
@@ -179,10 +175,9 @@ app.get('/loggedin/room', async (req, res) => {
         }
     });
     if (userFound) {
-        if (mostRecentMessage) {
-            await databaseAccess.resetUnreadMessages(userFound);
-            console.log("Most recent message updated")
-        }
+        await databaseAccess.resetUnreadMessages(userFound);
+        console.log("Most recent message updated")
+
         res.render("room", {room: room[0], username: req.session.username, messages: roomMessages});
     }
     else {
